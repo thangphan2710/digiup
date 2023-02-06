@@ -1,0 +1,83 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: digiup-app-deployment
+  namespace: "default"
+  labels:
+    app: digiup-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: digiup-app
+  template:
+    metadata:
+      labels:
+        app: digiup-app
+    spec:
+      containers:
+      - name: "digiup-bo-app-sha256-1"
+        image: "gcr.io/digiup-364508/digiup-bo-app@sha256:e8a7be88645398154d2d20f7cbec543570c64e16ed170a2fc4b5b95899876a68"
+        ports:
+          - containerPort: 2710
+        volumeMounts:
+          - mountPath: /usr/local/tomcat8/webapps/datatdbh
+            name: mypvc
+        env:
+        - name: SPRING_USER_NAME
+          valueFrom:
+            secretKeyRef:
+              name: digiup-app-secret
+              key: SPRING_USER_NAME
+        - name: SPRING_PASSWORD
+          valueFrom: 
+            secretKeyRef:
+              name: digiup-app-secret
+              key: SPRING_PASSWORD
+        - name: SPRING_URL
+          valueFrom:
+            configMapKeyRef:
+              name: digiup-app-configmap
+              key: SPRING_URL
+      volumes:
+        - name: mypvc
+          persistentVolumeClaim:
+            claimName: bidvpvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: digiup-app-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: digiup-app
+  ports:    
+    - protocol: TCP
+      port: 2710
+      targetPort: 2710
+
+---
+apiVersion: "autoscaling/v2"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: digiup-app-autoscaling
+  namespace: "default"
+  labels:
+    app: digiup-app
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: digiup-app
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      target:
+        type: "Utilization"
+        averageUtilization: 80
