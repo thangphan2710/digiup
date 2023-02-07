@@ -44,19 +44,7 @@ spec:
       volumes:
         - name: mypvc
           persistentVolumeClaim:
-            claimName: bidvpvc
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: bidvpvc
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: filestore-digiup-app
-  resources:
-    requests:
-      storage: 1Ti
+            claimName: bidv-pvc
 
 ---
 apiVersion: v1
@@ -66,12 +54,10 @@ metadata:
 spec:
   selector:
     app: digiup-app
-  type: LoadBalancer
   ports:    
     - protocol: TCP
       port: 80
       targetPort: 2710
-      nodePort: 32000
 
 ---
 apiVersion: autoscaling/v2
