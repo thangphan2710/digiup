@@ -1,9 +1,8 @@
 ---
-apiVersion: "apps/v1"
-kind: "Deployment"
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: digiup-app-deployment
-  namespace: "default"
   labels:
     app: digiup-app
 spec:
@@ -16,9 +15,11 @@ spec:
       labels:
         app: digiup-app
     spec:
+      securityContext:
+        runAsUser: 0
       containers:
-      - name: "digiup-bo-app-sha256-1"
-        image: "gcr.io/digiup-364508/digiup-bo-app@sha256:e8a7be88645398154d2d20f7cbec543570c64e16ed170a2fc4b5b95899876a68"
+      - name: digiup-bo-app-sha256-1
+        image: gcr.io/digiup-364508/digiup-bo-app@sha256:e8a7be88645398154d2d20f7cbec543570c64e16ed170a2fc4b5b95899876a68
         ports:
           - containerPort: 2710
         volumeMounts:
@@ -44,6 +45,18 @@ spec:
         - name: mypvc
           persistentVolumeClaim:
             claimName: bidvpvc
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: bidvpvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: filestore-digiup-app
+  resources:
+    requests:
+      storage: 1Ti
 
 ---
 apiVersion: v1
@@ -51,34 +64,33 @@ kind: Service
 metadata:
   name: digiup-app-service
 spec:
-  type: LoadBalancer
   selector:
     app: digiup-app
+  type: LoadBalancer
   ports:    
     - protocol: TCP
-      port: 2710
+      port: 80
       targetPort: 2710
-      nodePort: 30005
+      nodePort: 32000
 
 ---
-apiVersion: "autoscaling/v2"
-kind: "HorizontalPodAutoscaler"
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
 metadata:
   name: digiup-app-autoscaling
-  namespace: "default"
   labels:
     app: digiup-app
 spec:
   scaleTargetRef:
-    kind: "Deployment"
+    kind: Deployment
     name: digiup-app
-    apiVersion: "apps/v1"
+    apiVersion: apps/v1
   minReplicas: 1
   maxReplicas: 5
   metrics:
-  - type: "Resource"
+  - type: Resource
     resource:
-      name: "cpu"
+      name: cpu
       target:
-        type: "Utilization"
+        type: Utilization
         averageUtilization: 80
