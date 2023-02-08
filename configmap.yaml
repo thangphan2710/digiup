@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: digiup-app-configmap
 data:
-  SPRING_URL: "jdbc:oracle:thin:@35.240.216.98:1521/db19c"
+  SPRING_URL: jdbc:oracle:thin:@35.240.216.98:1521/db19c

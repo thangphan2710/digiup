@@ -52,12 +52,14 @@ kind: Service
 metadata:
   name: digiup-app-service
 spec:
+  type: LoadBalancer
   selector:
     app: digiup-app
   ports:    
     - protocol: TCP
       port: 80
-      targetPort: 2710
+      targetPort: 8080
+      nodePort: 31003
 
 ---
 apiVersion: autoscaling/v2
