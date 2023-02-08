@@ -21,7 +21,7 @@ spec:
       - name: digiup-bo-app-sha256-1
         image: gcr.io/digiup-364508/digiup-bo-app@sha256:e8a7be88645398154d2d20f7cbec543570c64e16ed170a2fc4b5b95899876a68
         ports:
-          - containerPort: 2710
+          - containerPort: 8080
         volumeMounts:
           - mountPath: /usr/local/tomcat8/webapps/datatdbh
             name: mypvc
@@ -59,7 +59,7 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 8080
-      nodePort: 31003
+      nodePort: 31005
 
 ---
 apiVersion: autoscaling/v2
