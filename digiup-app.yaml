@@ -50,7 +50,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: digiup-app-LoadBalancer
+  name: digiup-app-service
 spec:
   type: LoadBalancer
   selector:
