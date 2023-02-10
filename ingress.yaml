@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: digiup-app-ingress
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "ingress-webapps"
+spec:
+  rules:
+  - host: "www.digiup01.com"
+    http:
+      paths:
+      - pathType: ImplementationSpecific
+        path: "/DIGIUPBO/login"
+        backend:
+          service:
+            name: digiup-app-service
+            port:
+              number: 80
